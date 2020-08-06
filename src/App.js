@@ -1,6 +1,17 @@
 import React from 'react';
 import logo from './logo.svg';
 import './App.css';
+import {
+  Route,
+  Link,
+  NavLink
+} from 'react-router-dom';
+
+//App Components
+import apiKey from './config';
+import Photo from './components/Photo';
+import Nav from './components/Nav';
+import NotFound from './components/NotFound';
 
 function App() {
   return (
