@@ -1,37 +1,122 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { Component } from 'react';
 import {
+  BrowserRouter,
   Route,
-  Link,
-  NavLink
+  Switch
 } from 'react-router-dom';
+import axios from 'axios';
 
-//App Components
+//Component imports
 import apiKey from './config';
-import Photo from './components/Photo';
+import PhotoContainer from './components/PhotoContainer';
 import Nav from './components/Nav';
-import NotFound from './components/NotFound';
+import SearchForm from './components/SearchForm';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+class App extends Component {
+  constructor() {
+    super();
+    this.state = {
+      photos: [],
+      sunsets: [],
+      waterfalls: [],
+      rainbows: [],
+      loading: true
+    };
+  }
+  //main search with default of sunsets
+  performSearch = (query = 'sunsets') => {
+    axios.get(`https://api.flickr.com/services/rest/?method=flickr.photos.search&api_key=${apiKey}&tags=${query}&per_page=24&format=json&nojsoncallback=1`)
+      .then(response => {
+        this.setState({
+          photos: response.data.photos.photo,
+          loading: false
+        });
+      })
+      .catch(error => {
+        console.log('Error fetching and parsing data', error);
+      });
+  }
+
+  componentDidMount() {
+    this.performSearch();
+
+    //sunset axios
+    axios.get(`https://api.flickr.com/services/rest/?method=flickr.photos.search&api_key=${apiKey}&tags=sunsets&per_page=24&format=json&nojsoncallback=1`)
+      .then(response => {
+        this.setState( prevState => ({
+          ...prevState,
+          sunsets: response.data.photos.photo,
+          loading: false
+        }));
+             })
+             .catch(error => {
+              console.log('Error fetching and parsing data', error);
+            });
+
+      //waterfalls axios
+      axios.get(`https://api.flickr.com/services/rest/?method=flickr.photos.search&api_key=${apiKey}&tags=waterfalls&per_page=24&format=json&nojsoncallback=1`)
+      .then(response => {
+        this.setState( prevState => ({
+          ...prevState,
+          waterfalls: response.data.photos.photo,
+          loading: false
+        }));
+        })
+        .catch(error => {
+          console.log('Error fetching and parsing data', error);
+        });
+
+      //rainbows axios
+      axios.get(`https://api.flickr.com/services/rest/?method=flickr.photos.search&api_key=${apiKey}&tags=rainbows&per_page=24&format=json&nojsoncallback=1`)
+      .then(response => {
+        this.setState( prevState => ({
+          ...prevState,
+          rainbows: response.data.photos.photo,
+          loading: false
+        }));
+             })
+             .catch(error => {
+              console.log('Error fetching and parsing data', error);
+            });
+  }
+
+  render() {
+    return (
+      <BrowserRouter>
+        <div className="container">
+          <SearchForm onSearch={this.performSearch} />
+          <Nav />
+          <Switch>
+            <Route exact path='/' render={ () =>
+                (this.state.loading)
+                ? <p>Loading...</p>
+                : <PhotoContainer data={this.state.photos} />
+              }   />
+            <Route exact path='/search/:query' render={ () =>
+                (this.state.loading)
+                ? <p>Loading...</p>
+                : <PhotoContainer data={this.state.photos} />
+              }    />
+            <Route exact path='/sunsets' render={ () =>
+              (this.state.loading)
+                ? <p>Loading...</p>
+                : <PhotoContainer data={this.state.sunsets} />
+            } />
+            <Route exact path='/waterfalls' render={ () =>
+              (this.state.loading)
+                ? <p>Loading...</p>
+                : <PhotoContainer data={this.state.waterfalls} />
+            } />
+            <Route exact path='/rainbows' render={ () =>
+              (this.state.loading)
+                ? <p>Loading...</p>
+                : <PhotoContainer data={this.state.rainbows} />
+            } />
+          </Switch>
+        </div>
+      </BrowserRouter>
+    );
+  }
 }
 
 export default App;
