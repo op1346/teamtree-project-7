@@ -81,10 +81,14 @@ class App extends Component {
   }
 
   render() {
+    console.log(this.state.photos);
     return (
       <BrowserRouter>
-        <div className="container">
-          <SearchForm onSearch={this.performSearch} />
+        <div>
+          <div className="main-header">
+            <h1 className="main-title">React Gallery App</h1>
+            <SearchForm onSearch={this.performSearch} />
+          </div>
           <Nav />
           <Switch>
             <Route exact path='/' render={ () =>
